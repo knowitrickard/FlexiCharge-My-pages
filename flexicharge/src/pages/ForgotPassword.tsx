@@ -1,7 +1,7 @@
 import { Button, TextField, Grid, Box } from "@material-ui/core";
 import Alert from "@mui/material/Alert";
 import Modal from "@mui/material/Modal";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { ValidationForm } from "../components/validation";
@@ -54,6 +54,8 @@ const inputFieldValue = {
 
 const ForgotPassword = () => {
 	const classes = useStyles();
+	const history = useHistory();
+
 	const {
 		ForgotPasswordHandleFormSubmit,
 		handleInputValue,
@@ -65,6 +67,7 @@ const ForgotPassword = () => {
 	} = ValidationForm();
 
 	if (redirect) {
+		history.push("/forgot-password");
 		return <Redirect to="/confirm-forgot-password" />;
 	}
 

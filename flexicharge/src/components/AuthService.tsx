@@ -3,15 +3,14 @@ import axios from "axios";
 const API_URL = "http://54.220.194.65:8080/auth/";
 
 class AuthService {
- 
-login(username: string, password: string) {
+	login(username: string, password: string) {
 		return axios
 			.post(API_URL + "sign-in", {
 				username: username,
 				password: password,
 			})
 			.then((response) => {
-				if (response.data.accessToken) {
+				if (response.data) {
 					localStorage.setItem("user", JSON.stringify(response.data));
 				}
 
@@ -36,16 +35,27 @@ login(username: string, password: string) {
 			confirmationCode: confirmationCode,
 		});
 	}
-	changePassword(
-		token: string,
-		password: string,
-		newPassword: string
-	) {
+
+	changePassword(token: string, password: string, newPassword: string) {
 		return axios.post(API_URL + "change-password", {
 			accessToken: token,
 			previousPassword: password,
 			newPassword: newPassword,
 		});
+	}
+
+	changeName(token: string, firstName: string, lastName: string) {
+
+		return axios.put(API_URL + "update-user", {
+			accessToken: token,
+			name: firstName,
+			family_name: lastName,
+		}).then((response)=>{
+			const localstore = JSON.parse(localStorage.getItem("user")!)
+			localstore.name = firstName
+			localstore.family_name = lastName
+			localStorage.setItem("user", JSON.stringify(localstore));
+		})
 	}
 
 	logout() {

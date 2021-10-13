@@ -9,17 +9,12 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-// import { ReactComponent as Title } from '../../assets/title.svg';
-import { Icon } from "@material-ui/core";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import HistoryIcon from "@mui/icons-material/History";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useHistory } from "react-router-dom";
 import AuthService from "./AuthService";
-import Logout from "@mui/icons-material/Logout";
-
-// import MenuIcon from '@material-ui/icons/Menu';
 
 const drawerWidth = 240;
 
@@ -38,7 +33,6 @@ const categories = [
 				icon: <HistoryIcon />,
 				location: "/charging-sessions",
 			},
-			{ id: "Invoices", icon: <ReceiptIcon />, location: "/invoices" },
 		],
 	},
 ];

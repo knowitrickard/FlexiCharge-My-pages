@@ -8,12 +8,10 @@ import { ThemeProvider } from "@material-ui/core";
 import Theme from "./theme/theme";
 import ForgotPassword from "./pages/ForgotPassword";
 import ConfirmForgotPassword from "./pages/ConfirmForgotPassword";
-import AuthService from "./components/AuthService";
 import Profile from "./pages/Profile";
 import ChangePassword from "./pages/ChangePassword";
 
 function App() {
-	const isLoggedIn = AuthService.getCurrentUser() ? true : false;
 	return (
 		<ThemeProvider theme={Theme}>
 			<div className="App">

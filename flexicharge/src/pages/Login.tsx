@@ -1,13 +1,16 @@
 import { Button, TextField, Grid, Box } from "@material-ui/core";
 import Alert from "@mui/material/Alert";
 import Modal from "@mui/material/Modal";
-import { Redirect, Link } from "react-router-dom";
+import { Redirect, Link, useHistory } from "react-router-dom";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import LockIcon from "@material-ui/icons/Lock";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import { ValidationForm } from "../components/validation";
 import loginB from "../assets/loginB.svg";
 import AccountCircle from "@material-ui/icons/AccountCircle";
+import { useEffect } from "react";
+import AuthService from "../components/AuthService";
+
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -79,6 +82,8 @@ const inputFieldValues = [
 
 const Login = () => {
 	const classes = useStyles();
+	const history = useHistory();
+
 	const {
 		LogInhandleFormSubmit,
 		handleInputValue,
@@ -88,6 +93,17 @@ const Login = () => {
 		open,
 		handleClose,
 	} = ValidationForm();
+
+	useEffect(() => {
+		const currentUser = AuthService.getCurrentUser();
+		if (!currentUser) {
+			console.log("there is no user");
+		} else {
+			console.log("there is  user");
+			history.push("/profile");
+		}
+	}, []);
+
 
 	if (redirect) {
 		return <Redirect to="/profile" />;

@@ -5,15 +5,14 @@ import {
 	GridToolbarDensitySelector,
 	GridCellParams,
 } from "@mui/x-data-grid";
-import clsx from "clsx";
 import Navbar from "../components/Navbar";
 import { useHistory } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
 import AuthService from "../components/AuthService";
-
 import BottomNavigationBar from "../components/BottomNavigation";
 import Mobile from "../components/Mobile";
+import TransactionService from "../components/TransactionService";
 
 const useStyles = makeStyles((theme: Theme) =>
 	createStyles({
@@ -82,144 +81,14 @@ const columns = [
 	},
 ];
 
-const rows = [
-	{
-		id: 1,
-		date: "2021-03-21",
-		electricityTransferred: 64,
-		priceKwh: 1.5,
-		totalCost: 96,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 2,
-		date: "2021-03-27",
-		electricityTransferred: 98,
-		priceKwh: 1.5,
-		totalCost: 147,
-		location: "Asecs Röd Entre, Jönköping",
-	},
-	{
-		id: 3,
-		date: "2021-04-10",
-		electricityTransferred: 75,
-		priceKwh: 1.5,
-		totalCost: 112.5,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 4,
-		date: "2021-03-25",
-		electricityTransferred: 100,
-		priceKwh: 1.4,
-		totalCost: 140,
-		location: "Sjukhusgatan, Jönköping",
-	},
-	{
-		id: 5,
-		date: "2021-03-26",
-		electricityTransferred: 80,
-		priceKwh: 1.5,
-		totalCost: 120,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 6,
-		date: "2021-03-28",
-		electricityTransferred: 66,
-		priceKwh: 1.5,
-		totalCost: 99,
-		location: "Asecs Röd Entre, Jönköping",
-	},
-	{
-		id: 7,
-		date: "2021-03-30",
-		electricityTransferred: 67,
-		priceKwh: 1.3,
-		totalCost: 87.1,
-		location: "Asecs Röd Entre, Jönköping",
-	},
-	{
-		id: 8,
-		date: "2021-05-31",
-		electricityTransferred: 95,
-		priceKwh: 1.5,
-		totalCost: 142.5,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 9,
-		date: "2021-05-17",
-		electricityTransferred: 84,
-		priceKwh: 1.6,
-		totalCost: 134.4,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 10,
-		date: "2021-06-05",
-		electricityTransferred: 76,
-		priceKwh: 1.6,
-		totalCost: 121.6,
-		location: "Sjukhusgatan, Jönköping",
-	},
-	{
-		id: 11,
-		date: "2021-05-01",
-		electricityTransferred: 100,
-		priceKwh: 1.6,
-		totalCost: 160,
-		location: "Sjukhusgatan, Jönköping",
-	},
-	{
-		id: 12,
-		date: "2021-03-21",
-		electricityTransferred: 100,
-		priceKwh: 1.4,
-		totalCost: 140,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 13,
-		date: "2021-03-27",
-		electricityTransferred: 94,
-		priceKwh: 1.5,
-		totalCost: 141,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 14,
-		date: "2021-04-10",
-		electricityTransferred: 67,
-		priceKwh: 1.5,
-		totalCost: 100.5,
-		location: "Asecs Röd Entre, Jönköping",
-	},
-	{
-		id: 15,
-		date: "2021-03-25",
-		electricityTransferred: 76,
-		priceKwh: 1.4,
-		totalCost: 106.4,
-		location: "Per-Brahe Parkeringshus, Jönköping",
-	},
-	{
-		id: 16,
-		date: "2021-03-26",
-		electricityTransferred: 87,
-		priceKwh: 1.5,
-		totalCost: 130.5,
-		location: "Asecs Röd Entre, Jönköping",
-	},
-	{
-		id: 17,
-		date: "2021-03-28",
-		electricityTransferred: 90,
-		priceKwh: 1.5,
-		totalCost: 135,
-		location: "Sjukhusgatan, Jönköping",
-	},
-];
+interface IRow {
+	id: number;
+	date: String;
+	electricityTransferred: any;
+	priceKwh: any;
+	totalCost: number;
+	location: any;
+}
 
 const toolbar = () => {
 	return (
@@ -233,13 +102,81 @@ const toolbar = () => {
 const ChargingSessions = () => {
 	const classes = useStyles();
 	const history = useHistory();
+	const currentUser = AuthService.getCurrentUser();
+	const userName = currentUser.username
+	var rowTest: any = [];
+	const [loading, setLoading] =useState(false)
+
+	const [rows, setFinalRows] = useState<IRow[]>([
+
+	])
+
 
 	useEffect(() => {
-		const currentUser = AuthService.getCurrentUser();
 		if (!currentUser) {
 			history.push("/sign-up");
 		}
 	}, []);
+	useEffect(() => {
+		data();
+	}, []);
+
+
+	const data = async () => {
+		setLoading(true)
+
+
+		const chargingSessionResponse = await TransactionService.getChargingSessions(userName);
+		if (chargingSessionResponse.error) {
+			//handle error, visa att det blev fel
+			return;
+		}
+
+		let charginSessionRows: IRow[] = [];
+		for (const chargingSession of chargingSessionResponse.result) {
+			let { kwhTransfered, pricePerKwh, timestamp, chargerID, transactionID } = chargingSession;
+			if (!kwhTransfered) kwhTransfered = 0
+
+			if (!chargerID)
+				return;
+
+			pricePerKwh = pricePerKwh / 100
+
+			const totalCost = kwhTransfered * pricePerKwh
+			const date = new Date(timestamp * 1000).toLocaleDateString("sv");
+
+			const getChargerResponse = await TransactionService.getCharger(chargerID);
+			if (getChargerResponse.error) {
+				//handle error, failed to fetch certain charger
+				return;
+			}
+
+			let { chargePointID } = getChargerResponse.result;
+			if (!chargePointID) {
+				//handle error, no chargePointID Found
+				return;
+			}
+
+			const getChargerLocationResponse = await TransactionService.getChargerLocation(chargePointID);
+			const row: IRow =
+			{
+				id: transactionID,
+				date: date,
+				electricityTransferred: kwhTransfered,
+				priceKwh: pricePerKwh,
+				totalCost: totalCost,
+				location: getChargerLocationResponse.result.name,
+			}
+
+			charginSessionRows.push(row);
+
+
+		}
+
+		setFinalRows(rows.concat(charginSessionRows));
+		setLoading(false)
+
+	}
 
 	return (
 		<>
@@ -250,19 +187,19 @@ const ChargingSessions = () => {
 			>
 				<div style={{ display: "flex", height: "100%" }}>
 					<div style={{ flexGrow: 1 }}>
-						<h1>Charging</h1>
+						<h1 style={{ color: "whitesmoke" }}>Transactions</h1>
 						<DataGrid
 							rows={rows}
 							columns={columns}
 							// rowHeight={60}
 							getCellClassName={(params: GridCellParams) => {
 								const value = params.value as string;
-								console.log(value.length);
 								if (params.field === "location") {
 									return value.length > 28 ? "long" : "short";
 								}
 								return "";
 							}}
+							loading={loading}
 							pageSize={10}
 							disableColumnMenu
 							disableSelectionOnClick
